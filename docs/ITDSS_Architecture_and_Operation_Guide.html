@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ITDSS: Architecture, Mathematical Specification & Operations Guide</title>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm 18mm 16mm;
+    @bottom-right {
+      content: counter(page);
+    }
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    background: #ffffff;
+    line-height: 1.6;
+    font-size: 13.5px;
+    margin: 0;
+    padding: 24px;
+  }
+  h1 {
+    font-size: 26px;
+    color: #0f172a;
+    border-bottom: 3px solid #2563eb;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 15px;
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+  h2 {
+    font-size: 19px;
+    color: #1e3a8a;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding-bottom: 5px;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 15px;
+    color: #1e293b;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+  }
+  p {
+    margin: 8px 0;
+  }
+  .alert-important {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin: 16px 0;
+    color: #92400e;
+    font-size: 13px;
+  }
+  .alert-important strong {
+    color: #78350f;
+  }
+  .alert-note {
+    background: #f0fdf4;
+    border-left: 4px solid #22c55e;
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin: 16px 0;
+    color: #166534;
+    font-size: 13px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 12.5px;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 8px 10px;
+    text-align: left;
+  }
+  th {
+    background: #f1f5f9;
+    color: #334155;
+    font-weight: 600;
+  }
+  tr:nth-child(even) {
+    background: #f8fafc;
+  }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    background: #f1f5f9;
+    padding: 2px 5px;
+    border-radius: 3px;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+  }
+  pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11.5px;
+    line-height: 1.45;
+    overflow-x: auto;
+    margin: 12px 0;
+    page-break-inside: avoid;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border: none;
+  }
+  .formula-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-family: "Cambria Math", "Times New Roman", serif;
+    font-size: 14.5px;
+    color: #0f172a;
+  }
+  ul, ol {
+    margin: 6px 0 12px 20px;
+    padding: 0;
+  }
+  li {
+    margin-bottom: 4px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  .badge-buy { background: #dcfce7; color: #15803d; }
+  .badge-sell { background: #fee2e2; color: #b91c1c; }
+  .badge-neutral { background: #f1f5f9; color: #64748b; }
+  .page-break {
+    page-break-before: always;
+  }
+  .arch-box {
+    background: #f8fafc;
+    border: 1.5px solid #94a3b8;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .arch-item {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px;
+  }
+  .arch-item h4 {
+    margin: 0 0 4px 0;
+    font-size: 13.5px;
+    color: #1e3a8a;
+  }
+  .arch-item p {
+    margin: 0;
+    font-size: 12px;
+    color: #475569;
+  }
+</style>
+</head>
+<body>
+
+<h1>ITDSS: Comprehensive Architecture & Operations Guide</h1>
+<div class="subtitle">Intelligent Trading Decision Support System — Architecture, Mathematical Specifications & Run Manual (v2.0.0)</div>
+
+<div class="alert-important">
+  <strong>IMPORTANT NOTICE: Educational Research Platform, Not Financial Advice</strong><br>
+  ITDSS is an explainable quantitative decision-support tool. <strong>It places no live orders and connects to no broker execution APIs.</strong> In rigorous purged walk-forward backtesting across 37 instruments, the current model has <strong>no statistically proven predictive edge</strong> over a no-skill baseline (such as majority-class prediction or passive buy-and-hold). The platform explicitly surfaces this finding on every analysis page and model card.
+</div>
+
+<h2>1. System Overview & Core Principles</h2>
+<p>
+The <strong>Intelligent Trading Decision Support System (ITDSS)</strong> provides risk-first, explainable algorithmic analysis for <strong>37 global instruments</strong> spanning 5 asset classes (Forex, Cryptocurrencies, Equity Indices, Commodities, and Stocks), alongside arbitrary ticker queries from Yahoo Finance.
+</p>
+<ul>
+  <li><strong>Explainability over Black Boxes:</strong> Every trade signal includes feature contribution attributions (Saabas tree path decomposition), showing precisely why a decision was reached.</li>
+  <li><strong>Strict Triple Barrier Risk Geometry:</strong> Stop loss fixed at -1.5 ATR, take profit at +3.0 ATR (2:1 Reward-to-Risk ratio), and a 24-bar maximum time horizon.</li>
+  <li><strong>Scale-Free Machine Learning:</strong> Technical indicators are normalized into dimensionless ratios (ATR fractions or percentage-of-range), allowing one single model to score assets with wildly divergent nominal price levels.</li>
+  <li><strong>Full Accountability Journal:</strong> Live recommendations are timestamped and committed to an append-only SQLite database upon issuance, and settled as subsequent price candles unfold.</li>
+  <li><strong>No Repainting / No Lookahead:</strong> The pipeline strictly evaluates closed price candles, completely discarding the active forming bar.</li>
+</ul>
+
+<h2>2. High-Level Architecture</h2>
+<div class="arch-box">
+  <div style="font-weight: 600; color: #1e3a8a; margin-bottom: 8px;">ITDSS Core System Pipeline</div>
+  <div class="arch-grid">
+    <div class="arch-item">
+      <h4>1. Data Layer (data_fetcher.py)</h4>
+      <p>Fetches Yahoo Finance bars, sanitizes UTC timestamps, enforces closed-bar cuts, converts minor currencies (GBp &rarr; GBP), and caches responses in a single-flight LRU store.</p>
+    </div>
+    <div class="arch-item">
+      <h4>2. Feature Engine (indicators.py)</h4>
+      <p>Calculates 9 scale-free ratios: Williams %R, RSI, Relative ATR, Relative Volatility, 50/200 EMA Spread, EMA Slope, Distance from EMA, and 10/50 Momentum.</p>
+    </div>
+    <div class="arch-item">
+      <h4>3. ML Scorer (ml_scorer.py & training.py)</h4>
+      <p>Random Forest (300 trees) with Platt Sigmoid Probability Calibration. Computes positive expectancy filter, TradeScore ranking, and Saabas feature drivers.</p>
+    </div>
+    <div class="arch-item">
+      <h4>4. Risk & Position Engine (risk.py)</h4>
+      <p>Sizes trades dynamically based on account capital, user risk %, FX conversion, ML confidence multiplier (0.5 to 1.0), and enforces ESMA regulatory leverage caps.</p>
+    </div>
+    <div class="arch-item">
+      <h4>5. Signal Journal (journal.py)</h4>
+      <p>Append-only SQLite tracking. Live daemon thread verifies price evolution, settling open signals to win, loss, or timeout, and updates empirical performance.</p>
+    </div>
+    <div class="arch-item">
+      <h4>6. Delivery Layer (FastAPI & React 19)</h4>
+      <p>RESTful backend serving JSON endpoints and static bundled frontend. React UI supports 6 languages (including RTL Arabic), dark/light modes, and colorblind safety.</p>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<h2>3. Scale-Free Feature Engineering</h2>
+<p>
+Traditional technical indicators depend heavily on nominal price levels. In ITDSS, all indicators are transformed into dimensionless ratios:
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Mathematical Formulation</th>
+      <th>Analytical Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>williams_r</code></td>
+      <td><code>-100 &times; (Max<sub>14</sub>(H) - C) / (Max<sub>14</sub>(H) - Min<sub>14</sub>(L) + &epsilon;)</code></td>
+      <td>Overbought/oversold oscillator bounded in [-100, 0].</td>
+    </tr>
+    <tr>
+      <td><code>rsi</code></td>
+      <td><code>100 &times; EMA<sub>14</sub>(Up) / (EMA<sub>14</sub>(Up) + EMA<sub>14</sub>(Down) + &epsilon;)</code></td>
+      <td>Wilder-smoothed momentum velocity bounded in [0, 100].</td>
+    </tr>
+    <tr>
+      <td><code>atr_rel</code></td>
+      <td><code>ATR<sub>14</sub> / (SMA<sub>200</sub>(ATR<sub>14</sub>) + &epsilon;)</code></td>
+      <td>Current market volatility relative to its long-term norm.</td>
+    </tr>
+    <tr>
+      <td><code>vol_rel</code></td>
+      <td><code>&sigma;<sub>20</sub>(returns) / (&sigma;<sub>100</sub>(returns) + &epsilon;)</code></td>
+      <td>Short-term volatility compression vs medium-term volatility.</td>
+    </tr>
+    <tr>
+      <td><code>ema_spread</code></td>
+      <td><code>(EMA<sub>50</sub>(C) - EMA<sub>200</sub>(C)) / ATR<sub>14</sub></code></td>
+      <td>Macro trend strength expressed in volatility units (ATR).</td>
+    </tr>
+    <tr>
+      <td><code>ema_slope</code></td>
+      <td><code>(EMA<sub>50</sub>(C)<sub>t</sub> - EMA<sub>50</sub>(C)<sub>t-10</sub>) / ATR<sub>14</sub></code></td>
+      <td>Velocity and curvature of the primary trend filter.</td>
+    </tr>
+    <tr>
+      <td><code>dist_fast</code></td>
+      <td><code>(C - EMA<sub>50</sub>(C)) / ATR<sub>14</sub></code></td>
+      <td>Mean-reversion displacement from fast moving average.</td>
+    </tr>
+    <tr>
+      <td><code>mom_10</code></td>
+      <td><code>(C<sub>t</sub> - C<sub>t-10</sub>) / ATR<sub>14</sub></code></td>
+      <td>10-period directional price momentum in ATR units.</td>
+    </tr>
+    <tr>
+      <td><code>mom_50</code></td>
+      <td><code>(C<sub>t</sub> - C<sub>t-50</sub>) / ATR<sub>14</sub></code></td>
+      <td>50-period intermediate price momentum in ATR units.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. Mathematical Modeling & Triple Barrier Labeling</h2>
+
+<h3>4.1 Triple Barrier Construction</h3>
+<p>
+Signals are evaluated with asymmetric price barriers and a hard time horizon:
+</p>
+<ul>
+  <li><strong>Target (Take Profit):</strong> <code>Entry + 3.0 &times; ATR</code> for BUY (<code>Entry - 3.0 &times; ATR</code> for SELL).</li>
+  <li><strong>Stop Loss:</strong> <code>Entry - 1.5 &times; ATR</code> for BUY (<code>Entry + 1.5 &times; ATR</code> for SELL).</li>
+  <li><strong>Horizon Timeout:</strong> 24 bars. If neither barrier is hit by bar 24, trade closes at the 24th bar Close.</li>
+  <li><strong>Conservative Execution Rules:</strong> If a bar touches both Stop and Target, the Stop loss takes precedence. Gaps beyond the stop fill at the open price.</li>
+</ul>
+
+<h3>4.2 Expectancy-Based Decision Rule</h3>
+<p>
+The system emits a BUY or SELL signal <em>only</em> if expected return after costs is strictly positive:
+</p>
+<div class="formula-card">
+  E[R] = P<sub>win</sub> &times; RR + (1 - P<sub>win</sub>) &times; R&#772;<sub>nonwin</sub> - Cost<sub>R</sub> &gt; 0
+</div>
+<p>Where <code>RR = 2.0</code>, <code>R&#772;<sub>nonwin</sub></code> is the empirical historical average outcome of non-winning trades, and <code>Cost<sub>R</sub></code> converts asset-class spread/slippage into R units. If <code>E[R] &le; 0</code>, the trade is marked <span class="badge badge-neutral">NEUTRAL</span>.</p>
+
+<h3>4.3 TradeScore Ranking</h3>
+<p>
+Active opportunities across the 37 instruments are prioritized via TradeScore:
+</p>
+<div class="formula-card">
+  TradeScore = (P<sub>win</sub> &times; RR) / atr_rel
+</div>
+<p>This scores high-probability setups higher, while penalizing instruments experiencing extreme, unstable volatility spikes.</p>
+
+<div class="page-break"></div>
+
+<h2>5. Dynamic Risk & Position Sizing</h2>
+<p>
+Positions are sized so that a hit on the stop loss incurs a loss equal to exactly the user-specified percentage of capital, converted into the user's account currency:
+</p>
+
+<div class="formula-card">
+  Risk per Unit = |Entry - Stop| &times; FX<sub>instrument &rarr; account</sub><br><br>
+  M<sub>size</sub> = clip(0.5 + 5 &times; (P<sub>win</sub> - P<sub>breakeven</sub>), 0.5, 1.0)<br><br>
+  Position Units = (Capital &times; Risk% &times; M<sub>size</sub>) / Risk per Unit
+</div>
+
+<div class="alert-note">
+  <strong>Regulatory Leverage Protection:</strong> Position sizes are capped automatically by ESMA-modeled institutional limits: Forex (30x), Indices (20x), Commodities (10x), Stocks (5x), Cryptocurrencies (2x).
+</div>
+
+<h2>6. API Endpoints Quick Reference</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Endpoint</th>
+      <th>Method</th>
+      <th>Key Parameters</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>/api/health</code></td>
+      <td>GET</td>
+      <td>None</td>
+      <td>Server health and model bundle status (1h &amp; 1d).</td>
+    </tr>
+    <tr>
+      <td><code>/api/symbols</code></td>
+      <td>GET</td>
+      <td>None</td>
+      <td>Returns 37 universe symbols, timeframes, and currencies.</td>
+    </tr>
+    <tr>
+      <td><code>/api/analyze</code></td>
+      <td>GET</td>
+      <td><code>timeframe, asset, capital, risk, currency, top</code></td>
+      <td>Full universe scan with personalized sizing and Saabas drivers.</td>
+    </tr>
+    <tr>
+      <td><code>/api/top-trades</code></td>
+      <td>GET</td>
+      <td><code>timeframe, capital, risk, currency, n</code></td>
+      <td>Top N actionable (non-neutral) ranked trades.</td>
+    </tr>
+    <tr>
+      <td><code>/api/analyze/{symbol}</code></td>
+      <td>GET</td>
+      <td><code>symbol, timeframe, capital, risk, currency</code></td>
+      <td>Detailed single-instrument analysis (works for any Yahoo symbol).</td>
+    </tr>
+    <tr>
+      <td><code>/api/candles/{symbol}</code></td>
+      <td>GET</td>
+      <td><code>symbol, timeframe, n</code></td>
+      <td>OHLC candle series with 50 &amp; 200 EMA overlays.</td>
+    </tr>
+    <tr>
+      <td><code>/api/search</code></td>
+      <td>GET</td>
+      <td><code>q</code></td>
+      <td>Yahoo Finance live symbol autocomplete search.</td>
+    </tr>
+    <tr>
+      <td><code>/api/history</code></td>
+      <td>GET</td>
+      <td><code>timeframe</code></td>
+      <td>Realized track record of all historical signals from SQLite journal.</td>
+    </tr>
+    <tr>
+      <td><code>/api/model</code></td>
+      <td>GET</td>
+      <td><code>timeframe</code></td>
+      <td>Walk-forward evaluation report card, calibration, confusion matrix.</td>
+    </tr>
+    <tr>
+      <td><code>/api/train</code></td>
+      <td>POST</td>
+      <td><code>timeframe</code> (Header: <code>X-Admin-Token</code>)</td>
+      <td>Triggers background expanding walk-forward retraining.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>7. Operational Run Commands</h2>
+<pre><code># 1. Build Frontend Production Distribution
+cd frontend && npm install && npm run build
+
+# 2. Start Backend FastAPI Server (Serves API + Built UI)
+python -m uvicorn main:app --app-dir backend --host 127.0.0.1 --port 8000
+
+# 3. (Optional) Run Frontend Vite Server for Live Development
+cd frontend && npm run dev
+
+# 4. Run Unit Test Suite
+cd backend && python -m unittest
+
+# 5. Full Re-Evaluation & Model Training
+cd backend && python train.py
+</code></pre>
+
+<p style="text-align: center; color: #94a3b8; font-size: 11px; margin-top: 30px;">
+  ITDSS Technical Manual &bull; Generated for Workspace itdss &bull; 2026
+</p>
+
+</body>
+</html>
