@@ -39,9 +39,7 @@ app = FastAPI(title="ITDSS", description="Intelligent Trading Decision Support S
               version="2.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://itdss-frontend.onrender.com"
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"]
