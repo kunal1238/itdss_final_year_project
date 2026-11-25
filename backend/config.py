@@ -73,8 +73,13 @@ CURRENCIES = ["USD", "EUR", "GBP", "INR", "JPY", "CNY", "AUD", "CAD", "CHF", "BR
               "ZAR", "NGN", "AED", "SGD", "HKD", "KRW", "MXN", "IDR", "TRY", "SAR"]
 
 # Deployment
-ALLOWED_ORIGINS = [o for o in os.getenv(
-    "ITDSS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(",") if o]
+# Deployment
+ALLOWED_ORIGINS = [
+    o.strip() for o in os.getenv(
+        "ITDSS_ORIGINS",
+        "http://localhost:3000,http://localhost:5173,https://itdss-frontend.onrender.com"
+    ).split(",") if o.strip()
+]
 ADMIN_TOKEN = os.getenv("ITDSS_ADMIN_TOKEN", "")        # empty = /api/train disabled
 RATE_LIMIT = int(os.getenv("ITDSS_RATE_LIMIT", "60"))   # requests/min/IP
 BACKGROUND = os.getenv("ITDSS_BACKGROUND", "1") == "1"
